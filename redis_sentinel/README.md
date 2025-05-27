@@ -74,7 +74,7 @@ echo daemonize yes >> /etc/redis/redis.conf && echo supervised systemd >> /etc/r
 ```
 Note: Chỉ thực hiện een 2 server slave
 ```
-echo replicaof 10.54.132.33 6379 >> /etc/redis/redis.conf # IP redis master
+echo replicaof 10.255.76.31 6379 >> /etc/redis/redis.conf # IP redis master
 ```
 
 **Create service restart**
@@ -84,7 +84,7 @@ port 26379
 daemonize yes				
 logfile "/var/log/redis/sentinel.log"
 dir "/var/lib/redis"
-sentinel monitor mymaster 10.54.132.33 6379 2 # IP set master slave
+sentinel monitor mymaster 10.255.76.31 6379 2 # IP set master slave
 sentinel down-after-milliseconds mymaster 30000
 sentinel failover-timeout mymaster 180000
 sentinel auth-pass mymaster 5Kx98DsA#2024
