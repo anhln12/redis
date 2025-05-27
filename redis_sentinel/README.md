@@ -74,7 +74,7 @@ echo daemonize yes >> /etc/redis/redis.conf && echo supervised systemd >> /etc/r
 ```
 Note: Chỉ thực hiện een 2 server slave
 ```
-echo replicaof IP 6379 >> /etc/redis/redis.conf # IP redis master
+echo replicaof 10.54.132.33 6379 >> /etc/redis/redis.conf # IP redis master
 ```
 
 **Create service restart**
