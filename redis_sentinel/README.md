@@ -1,4 +1,4 @@
-Thực hiện trên cả 3 servers
+**Thực hiện trên cả 3 servers**
 
 1. Khai báo rule firewalld
 ```
@@ -55,12 +55,9 @@ cp /opt/redis-6.2.14/redis.conf /etc/redis/redis.conf
 
 **Also add less-privileged user to run Redis daemon**
 ```
-useradd redis -M -g daemon
+useradd redis -s /usr/sbin/nologin
 passwd -l redis
 
-chown -R redis:daemon /opt/redis-6.2.14
-chown -R redis:daemon /var/log/redis
-chown -R redis:daemon /var/lib/redis
 ```
 
 **Change config redis.conf**
@@ -80,13 +77,97 @@ Note: Chỉ thực hiện een 2 server slave
 echo replicaof IP 6379 >> /etc/redis/redis.conf # IP redis master
 ```
 
-Chown owner
+**Create service restart**
 ```
-chown -R redis. /etc/redis && chown -R redis. /var/log/redis && chown -R redis. /var/lib/redis
+cat << EOF > /etc/redis/sentinel.conf
+port 26379
+daemonize yes				
+logfile "/var/log/redis/sentinel.log"
+dir "/var/lib/redis"
+sentinel monitor mymaster 10.54.132.33 6379 2 # IP set master slave
+sentinel down-after-milliseconds mymaster 30000
+sentinel failover-timeout mymaster 180000
+sentinel auth-pass mymaster 5Kx98DsA#2024
+sentinel parallel-syncs mymaster 1
+EOF
+
+
+cat << EOF > /etc/systemd/system/redis-sentinel.service
+[Unit]
+Description=Advanced key-value store
+After=network.target
+Documentation=http://redis.io/documentation, man:redis-sentinel(1)
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/redis-sentinel /etc/redis/sentinel.conf
+ExecStop=/bin/kill -s TERM $MAINPID
+#PIDFile=/run/redis-sentinel.pid
+TimeoutStopSec=0
+Restart=always
+User=redis
+Group=redis
+RuntimeDirectory=sentinel
+RuntimeDirectoryMode=2755
+
+UMask=007
+PrivateTmp=yes
+LimitNOFILE=65535
+PrivateDevices=yes
+ProtectHome=yes
+ReadOnlyDirectories=/
+ReadWriteDirectories=-/var/lib/redis/sentinel
+ReadWriteDirectories=-/var/log/redis
+ReadWriteDirectories=-/run/sentinel
+
+NoNewPrivileges=true
+CapabilityBoundingSet=CAP_SETGID CAP_SETUID CAP_SYS_RESOURCE
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+
+# redis-sentinel can write to its own config file when in cluster mode so we
+# permit writing there by default. If you are not using this feature, it is
+# recommended that you replace the following lines with "ProtectSystem=full".
+ProtectSystem=true
+ReadWriteDirectories=-/etc/redis
+
+[Install]
+WantedBy=multi-user.target
+Alias=sentinel.service
+EOF
+
+
+cat << EOF > /etc/systemd/system/redis.service
+[Unit]
+Description=Redis persistent key-value database
+After=network.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/redis-server /etc/redis/redis.conf --supervised systemd
+ExecStop=/usr/libexec/redis-shutdown
+Type=forking
+User=redis
+LimitNOFILE=65536
+Group=redis
+RuntimeDirectory=redis
+RuntimeDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target
+EOF
 ```
 
+**Chown owner**
+```
+chown -R redis. /etc/redis && chown -R redis. /var/log/redis && chown -R redis. /var/lib/redis && chown -R redis. /opt/redis-6.2.14
+```
 
+**Start service**
+```
+systemctl daemon-reload
 
-**Note: Repeat these steps on all hosts.**
-
+systemctl enable redis && systemctl enable redis-sentinel && systemctl restart redis && systemctl restart redis-sentinel && systemctl status redis && systemctl status redis-sentinel
+```
 
