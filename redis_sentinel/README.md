@@ -171,3 +171,19 @@ systemctl daemon-reload
 systemctl enable redis && systemctl enable redis-sentinel && systemctl restart redis && systemctl restart redis-sentinel && systemctl status redis && systemctl status redis-sentinel
 ```
 
+4. Verify sentinel cluster
+```
+redis-cli -p 26379 info Sentinel
+# Sentinel
+sentinel_masters:1
+sentinel_tilt:0
+sentinel_running_scripts:0
+sentinel_scripts_queue_length:0
+sentinel_simulate_failure_flags:0
+master0:name=mymaster,status=ok,address=10.255.76.31:6379,slaves=2,sentinels=3
+
+redis-cli -p 26379 SENTINEL get-master-addr-by-name mymaster
+1) "10.255.76.31"
+2) "6379"
+```
+
