@@ -1,7 +1,32 @@
-
-
-
 Thực hiện trên cả 3 servers
+
+1. Khai báo rule firewalld
+```
+firewall-cmd --permanent --new-zone=redis
+firewall-cmd --permanent --zone=redis --add-port=6379/tcp
+firewall-cmd --permanent --zone=redis --add-port=26379/tcp
+firewall-cmd --permanent --zone=redis --add-port=16379/tcp
+firewall-cmd --reload
+
+firewall-cmd --permanent --zone=redis --add-source=client_server_private_IP
+```
+
+2. Optimize
+```
+optimize_redis.sh
+echo "redis hard nofile 100000" > /etc/security/limits.d/redis.conf
+echo "redis soft nofile 100000" >> /etc/security/limits.d/redis.conf
+echo "redis hard nproc 100000" >> /etc/security/limits.d/redis.conf
+echo "redis soft nproc 100000" >> /etc/security/limits.d/redis.conf
+sysctl vm.overcommit_memory = 1
+echo vm.overcommit_memory = 1 >> /etc/sysctl.conf
+echo 1 > /proc/sys/vm/swappinesss
+echo 'vm.swappiness = 1' >> /etc/sysctl.conf
+sysctl -w fs.file-max = 1000000
+echo never > /sys/kernel/mm/transparent_hugepage/enabled
+
+```
+3. Cài đặt Redis
 
 **Redis Installation**
 ```
@@ -37,6 +62,30 @@ chown -R redis:daemon /opt/redis-6.2.14
 chown -R redis:daemon /var/log/redis
 chown -R redis:daemon /var/lib/redis
 ```
+
+**Change config redis.conf**
+```
+sed -i 's/bind 127.0.0.1 -::1/bind 0.0.0.0/'g /etc/redis/redis.conf
+echo requirepass 5Kx98DsA#2024 >> /etc/redis/redis.conf && echo masterauth 5Kx98DsA#2024 >> /etc/redis/redis.conf
+
+sed -i 's/^\(logfile.*\)$/# \1/' /etc/redis/redis.conf
+sed -i 's/^\(dir.*\)$/# \1/' /etc/redis/redis.conf
+echo logfile "/var/log/redis/redis.log" >> /etc/redis/redis.conf && echo dir "/var/lib/redis/redis" >> /etc/redis/redis.conf
+
+sed -i 's/^\(daemonize.*\)$/#\1/' /etc/redis/redis.conf
+echo daemonize yes >> /etc/redis/redis.conf && echo supervised systemd >> /etc/redis/redis.conf
+```
+Note: Chỉ thực hiện een 2 server slave
+```
+echo replicaof IP 6379 >> /etc/redis/redis.conf # IP redis master
+```
+
+Chown owner
+```
+chown -R redis. /etc/redis && chown -R redis. /var/log/redis && chown -R redis. /var/lib/redis
+```
+
+
 
 **Note: Repeat these steps on all hosts.**
 
