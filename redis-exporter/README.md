@@ -16,7 +16,7 @@ services:
     environment:
       REDIS_ADDR: "xx.xx.xx.xx:6379"
       REDIS_USER: null
-      REDIS_PASSWORD: 5Kx98DsA#2024
+      REDIS_PASSWORD: 5Kx
 ```
 
 Dashboard: https://grafana.com/grafana/dashboards/763
