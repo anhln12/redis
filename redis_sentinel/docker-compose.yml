@@ -1,0 +1,28 @@
+version: '3'
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  redis:
+    image: 'bitnami/redis:latest'
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - REDIS_PASSWORD=str0ng_passw0rd
+    networks:
+      - app-tier
+    ports:
+      - '6379:6379'
+  redis-sentinel:
+    image: 'bitnami/redis-sentinel:latest'
+    environment:
+      - REDIS_MASTER_PASSWORD=str0ng_passw0rd
+      - REDIS_MASTER_HOST=10.253.xx.xx
+      - REDIS_MASTER_PORT_NUMBER=6379
+    depends_on:
+      - redis
+    ports:
+      - '26379:26379'
+    networks:
+      - app-tier
