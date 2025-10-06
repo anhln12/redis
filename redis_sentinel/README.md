@@ -84,13 +84,14 @@ port 26379
 daemonize yes				
 logfile "/var/log/redis/sentinel.log"
 dir "/var/lib/redis"
-sentinel monitor mymaster 10.255.76.31 6379 2 # IP set master slave
+sentinel monitor mymaster 10.255.76.31 6379 2
 sentinel down-after-milliseconds mymaster 30000
 sentinel failover-timeout mymaster 180000
 sentinel auth-pass mymaster 5Kx98DsA#2024
 sentinel parallel-syncs mymaster 1
 EOF
 
+note: 10.255.76.31 6379 là ip redis master
 
 cat << EOF > /etc/systemd/system/redis-sentinel.service
 [Unit]
