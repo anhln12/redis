@@ -32,6 +32,9 @@ echo never > /sys/kernel/mm/transparent_hugepage/enabled
 ```
 yum update -y
 yum groupinstall -y 'Development Tools'
+
+apt install -y build-essential # ubuntu
+
 yum install -y wget
 wget https://download.redis.io/releases/redis-6.2.14.tar.gz
 tar zxvf redis-6.2.14.tar.gz -C /opt/
