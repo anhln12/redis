@@ -165,7 +165,7 @@ EOF
 
 
 # Ubuntu
-/etc/systemd/system/redis.service
+cat << EOF > /etc/systemd/system/redis.service
 [Unit]
 Description=Redis In-Memory Data Store
 After=network.target
@@ -179,7 +179,7 @@ Group=redis
 
 [Install]
 WantedBy=multi-user.target
-
+EOF
 ```
 
 **Chown owner**
