@@ -13,6 +13,11 @@ firewall-cmd --permanent --zone=redis --add-source=client_server_private_IP
 
 2. Optimize
 ```
+lsattr /etc/sysctl.conf
+Dấu hiệu: Nếu kết quả hiển thị có chữ i (ví dụ: ----i---------e---- /etc/sysctl.conf), thì chính xác là file này đang bị khóa cứng.
+
+chattr -i /etc/sysctl.conf
+
 optimize_redis.sh
 echo "redis hard nofile 100000" > /etc/security/limits.d/redis.conf
 echo "redis soft nofile 100000" >> /etc/security/limits.d/redis.conf
