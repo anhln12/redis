@@ -84,7 +84,7 @@ sed -i 's/^\(dir.*\)$/# \1/' /etc/redis/redis.conf
 echo logfile "/var/log/redis/redis.log" >> /etc/redis/redis.conf && echo dir "/var/lib/redis/redis" >> /etc/redis/redis.conf
 
 sed -i 's/^\(daemonize.*\)$/#\1/' /etc/redis/redis.conf
-echo daemonize yes >> /etc/redis/redis.conf && echo supervised systemd >> /etc/redis/redis.conf
+echo daemonize no >> /etc/redis/redis.conf && echo supervised no >> /etc/redis/redis.conf
 ```
 Note: Chỉ thực hiện een 2 server slave
 ```
