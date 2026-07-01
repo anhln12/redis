@@ -34,11 +34,17 @@ yum update -y
 yum groupinstall -y 'Development Tools'
 
 apt install -y build-essential # ubuntu
+apt-get install build-essential libc6-dev -y
 
 yum install -y wget
 wget https://download.redis.io/releases/redis-6.2.14.tar.gz
 tar zxvf redis-6.2.14.tar.gz -C /opt/
 cd /opt/redis-6.2.14/
+
+wget https://download.redis.io/releases/redis-8.6.4.tar.gz
+tar zxvf redis-8.6.4.tar.gz -C /opt/
+cd /opt/redis-8.6.4
+
 make distclean
 make install
 
