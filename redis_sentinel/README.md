@@ -216,6 +216,12 @@ sentinel_scripts_queue_length:0
 sentinel_simulate_failure_flags:0
 master0:name=mymaster,status=ok,address=10.255.76.31:6379,slaves=2,sentinels=3
 
+5. Failover master
+```
+redis-cli -p 26379 SENTINEL FAILOVER mymaster
+redis-cli -p 26379 SENTINEL MASTER mymaster
+```
+
 redis-cli -p 26379 SENTINEL get-master-addr-by-name mymaster
 1) "10.255.76.31"
 2) "6379"
